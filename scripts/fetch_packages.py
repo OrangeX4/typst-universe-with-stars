@@ -273,8 +273,9 @@ def process_packages() -> list[dict]:
                 )
                 if src.exists():
                     dst_dir = THUMBNAILS_DIR / pkg_name / latest_ver
-                    dst_dir.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(src, dst_dir / thumb)
+                    dst_file = dst_dir / thumb
+                    dst_file.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(src, dst_file)
                     thumbnail = f"thumbnails/{pkg_name}/{latest_ver}/{thumb}"
 
         # Copy README (any casing) for the package if present.
