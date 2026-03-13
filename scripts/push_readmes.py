@@ -37,6 +37,9 @@ CLONE_DIR = "/tmp/typst-packages"
 REPO_ROOT = Path(__file__).parent.parent
 TARGET_REPO = "https://github.com/OrangeX4/readmes-in-typst-universe"
 
+PACKAGES_DOCS_DIR = REPO_ROOT / "packages-docs"
+PACKAGES_METADATA_DIR = REPO_ROOT / "packages-metadata"
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -222,7 +225,12 @@ def generate_readme(packages: list[dict], updated_at: str) -> str:
 
 
 def collect_files(packages: list[dict], work_dir: Path) -> None:
-    """Populate metadata/ and readmes/ inside *work_dir*."""
+    """Populate metadata/ and readmes/ inside *work_dir*.
+
+    Prefers pre-collected files from packages-metadata/ and packages-docs/
+    (written by fetch_packages.py) so that the typst/packages clone is not
+    required when those directories are present.
+    """
     preview_dir = Path(CLONE_DIR) / "packages" / "preview"
     metadata_dir = work_dir / "metadata"
     readmes_dir = work_dir / "readmes"
@@ -232,19 +240,25 @@ def collect_files(packages: list[dict], work_dir: Path) -> None:
     for pkg in packages:
         name = pkg["name"]
         version = pkg["version"]
-        pkg_ver_dir = preview_dir / name / version
 
-        # typst.toml
-        toml_src = pkg_ver_dir / "typst.toml"
+        # typst.toml – prefer pre-collected file, fall back to clone.
+        toml_pre = PACKAGES_METADATA_DIR / f"{name}.toml"
+        toml_clone = preview_dir / name / version / "typst.toml"
+        toml_src = toml_pre if toml_pre.exists() else toml_clone
         if toml_src.exists():
             shutil.copy2(toml_src, metadata_dir / f"{name}.toml")
 
-        # README (any casing)
-        for readme_name in ("README.md", "readme.md", "Readme.md"):
-            candidate = pkg_ver_dir / readme_name
-            if candidate.exists():
-                shutil.copy2(candidate, readmes_dir / f"{name}.md")
-                break
+        # README – prefer pre-collected file, fall back to clone.
+        readme_pre = PACKAGES_DOCS_DIR / f"{name}.md"
+        if readme_pre.exists():
+            shutil.copy2(readme_pre, readmes_dir / f"{name}.md")
+        else:
+            pkg_ver_dir = preview_dir / name / version
+            for readme_name in ("README.md", "readme.md", "Readme.md"):
+                candidate = pkg_ver_dir / readme_name
+                if candidate.exists():
+                    shutil.copy2(candidate, readmes_dir / f"{name}.md")
+                    break
 
 
 # ---------------------------------------------------------------------------
