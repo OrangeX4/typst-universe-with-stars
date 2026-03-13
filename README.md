@@ -1,4 +1,6 @@
-# Typst Universe ★
+# Typst Universe with Stars (unofficial)
+
+> **This is an unofficial site**, not affiliated with or endorsed by the [official Typst Universe](https://typst.app/universe/).
 
 A GitHub Pages site that browses every package in [typst/packages](https://github.com/typst/packages) and ranks them by GitHub stars.
 
@@ -24,14 +26,20 @@ A scheduled GitHub Actions workflow (`.github/workflows/fetch-packages.yml`) run
    date via the GitHub API using `GITHUB_TOKEN`.
 5. Uses `git log --diff-filter=A` to determine when each version was first published
    to typst/packages.
-6. Commits the resulting `packages.json` back to the repository, which GitHub Pages
-   then serves.
+6. Assembles a `build/` directory with all static assets and `packages.json`, then
+   deploys it directly to GitHub Pages — no commits are pushed to `main`.
 
 ## GitHub Pages setup
 
 1. Go to **Settings → Pages**.
-2. Set *Source* to **Deploy from a branch**, branch `main`, folder `/ (root)`.
+2. Set *Source* to **GitHub Actions** (not "Deploy from a branch").
 3. The site will be available at `https://<user>.github.io/typst-universe-with-stars/`.
+
+## PR Previews
+
+Pull requests automatically get a preview deployment at
+`https://<user>.github.io/typst-universe-with-stars/pr-preview/pr-<number>/`
+via the `rossjrw/pr-preview-action`.
 
 ## Local development
 

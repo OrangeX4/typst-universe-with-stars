@@ -1,4 +1,4 @@
-name: Fetch Typst Package Data
+name: Fetch, Build & Deploy
 
 on:
   schedule:
@@ -6,13 +6,18 @@ on:
     - cron: "0 0 * * *"
     - cron: "0 12 * * *"
   workflow_dispatch: # Allow manual runs
-
-permissions:
-  contents: write
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
 
 jobs:
-  fetch:
+  build:
+    name: Fetch packages & build site
+    # For PR close events we only need the preview job (to clean up)
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -31,11 +36,72 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/fetch_packages.py
 
-      - name: Commit and push packages.json
+      - name: Assemble build directory
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add packages.json
-          git diff --cached --quiet \
-            && echo "packages.json unchanged – nothing to commit" \
-            || (git commit -m "chore: update packages.json [skip ci]" && git push)
+          mkdir -p build
+          cp index.html app.js style.css .nojekyll packages.json build/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build
+
+      - name: Upload preview artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-build
+          path: build
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  preview:
+    name: Deploy / clean-up PR preview
+    needs: [build]
+    # Run for all PR events; for closed PRs the build job is skipped so we
+    # use always() to allow this job to still run for cleanup.
+    if: |
+      always() &&
+      github.event_name == 'pull_request' &&
+      (needs.build.result == 'success' || github.event.action == 'closed')
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Prepare build directory
+        run: mkdir -p /tmp/build
+
+      - name: Download preview artifact
+        if: github.event.action != 'closed'
+        uses: actions/download-artifact@v4
+        with:
+          name: preview-build
+          path: /tmp/build
+
+      - name: Deploy / clean-up preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: /tmp/build
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+          action: auto

@@ -98,6 +98,24 @@ a { color: inherit; text-decoration: none; }
   color: #c4b5fd; /* violet-300 */
 }
 
+.unofficial-badge {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fbbf24; /* amber-400 */
+  letter-spacing: 0;
+}
+
+.site-disclaimer {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  color: #a78bfa; /* violet-400 */
+}
+
+.site-disclaimer a {
+  color: #c4b5fd;
+  text-decoration: underline;
+}
+
 /* =========================================================
    Controls bar (sticky)
    ========================================================= */
