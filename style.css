@@ -302,20 +302,18 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* =========================================================
-   Package grid
+   Package grid  –  masonry / waterfall
    ========================================================= */
 .packages-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  column-width: 300px;
+  column-gap: 20px;
 }
 
 /* =========================================================
    Package card
    ========================================================= */
 .package-card {
-  display: flex;
-  flex-direction: column;
+  display: block;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -325,6 +323,9 @@ a { color: inherit; text-decoration: none; }
   cursor: pointer;
   text-decoration: none;
   color: inherit;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 20px;
 }
 
 .package-card:hover {
@@ -336,10 +337,9 @@ a { color: inherit; text-decoration: none; }
 /* Thumbnail (templates only) */
 .card-thumbnail {
   width: 100%;
-  aspect-ratio: 4/3;
-  object-fit: cover;
-  background: var(--accent-light);
+  height: auto;
   display: block;
+  background: var(--accent-light);
   border-bottom: 1px solid var(--border);
 }
 
@@ -359,7 +359,6 @@ a { color: inherit; text-decoration: none; }
 .card-body {
   display: flex;
   flex-direction: column;
-  flex: 1;
   padding: 16px;
   gap: 8px;
 }
@@ -445,12 +444,6 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.875rem;
   color: var(--text-muted);
   margin: 0;
-  /* clamp to 3 lines */
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  flex: 1;
   line-height: 1.55;
 }
 
@@ -459,7 +452,6 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-top: auto;
 }
 
 .tag {
@@ -522,13 +514,14 @@ a { color: inherit; text-decoration: none; }
   .pill { padding: 4px 10px; }
 
   .packages-grid {
-    grid-template-columns: 1fr;
+    column-width: auto;
+    column-count: 1;
   }
 }
 
 @media (min-width: 1024px) {
   .packages-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    column-width: 320px;
   }
 }
 

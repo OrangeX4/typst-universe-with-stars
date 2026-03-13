@@ -24,8 +24,7 @@
 
   function formatStars(n) {
     if (n === null || n === undefined) return null;
-    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "k";
-    return String(n);
+    return n.toLocaleString();
   }
 
   function escapeHtml(str) {

@@ -43,6 +43,8 @@ jobs:
         run: |
           mkdir -p build
           cp index.html app.js style.css .nojekyll packages.json build/
+          [ -d thumbnails ] && cp -r thumbnails build/thumbnails || true
+          [ -d packages-docs ] && cp -r packages-docs build/packages-docs || true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

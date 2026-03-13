@@ -2,6 +2,8 @@
 
 > **This is an unofficial site**, not affiliated with or endorsed by the [official Typst Universe](https://typst.app/universe/).
 
+🌐 **Live site:** <https://orangex4.github.io/typst-universe-with-stars/>
+
 A GitHub Pages site that browses every package in [typst/packages](https://github.com/typst/packages) and ranks them by GitHub stars.
 
 ## Features
