@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Browse Typst packages and templates ranked by GitHub stars. Search, filter by kind and category, sort by stars or publish date."
+    />
+    <title>Typst Universe with Stars (unofficial)</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- ===== Site header ===== -->
+    <header class="site-header">
+      <div class="container">
+        <div class="header-inner">
+          <div class="logo">
+            <span class="logo-icon" aria-hidden="true">📦</span>
+            <div>
+              <h1 class="site-title">Typst Universe <span class="star-accent">★</span> <span class="unofficial-badge">(unofficial)</span></h1>
+              <p class="site-tagline">Packages &amp; templates ranked by GitHub stars</p>
+              <p class="site-disclaimer">This is an <strong>unofficial</strong> site, not affiliated with the <a href="https://typst.app/universe/" target="_blank" rel="noopener noreferrer">official Typst Universe</a>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== Sticky controls ===== -->
+    <div class="controls-bar" role="search">
+      <div class="container">
+        <!-- Search -->
+        <div class="search-wrap">
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input
+            type="search"
+            id="search-input"
+            class="search-input"
+            placeholder="Search by name, description, keywords…"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Search packages"
+          />
+          <button class="search-clear" id="search-clear" aria-label="Clear search" hidden>✕</button>
+        </div>
+
+        <!-- Filter row -->
+        <div class="filter-row">
+          <!-- Sort -->
+          <div class="filter-group">
+            <span class="filter-label" id="sort-label">Sort</span>
+            <div class="pill-group" role="group" aria-labelledby="sort-label" id="sort-group">
+              <button class="pill active" data-sort="stars" aria-pressed="true">★ Stars</button>
+              <button class="pill" data-sort="last_update" aria-pressed="false">↑ Updated</button>
+              <button class="pill" data-sort="last_publish" aria-pressed="false">↑ Published</button>
+            </div>
+          </div>
+
+          <!-- Kind -->
+          <div class="filter-group">
+            <span class="filter-label" id="kind-label">Kind</span>
+            <div class="pill-group" role="group" aria-labelledby="kind-label" id="kind-group">
+              <button class="pill active" data-kind="all" aria-pressed="true">All</button>
+              <button class="pill" data-kind="package" aria-pressed="false">Package</button>
+              <button class="pill" data-kind="template" aria-pressed="false">Template</button>
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div class="filter-group">
+            <label class="filter-label" for="category-select">Category</label>
+            <select id="category-select" class="category-select" aria-label="Filter by category">
+              <option value="">All categories</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Main content ===== -->
+    <main class="main-content">
+      <div class="container">
+        <!-- Result summary -->
+        <p id="result-info" class="result-info" aria-live="polite"></p>
+
+        <!-- Loading state -->
+        <div id="loading" class="loading-state" aria-live="polite">
+          <div class="spinner" aria-hidden="true"></div>
+          <p>Loading packages…</p>
+        </div>
+
+        <!-- Error state -->
+        <div id="error-state" class="error-state" hidden>
+          <p>⚠️ Failed to load package data. Please try refreshing the page.</p>
+        </div>
+
+        <!-- Package grid -->
+        <div
+          id="packages-grid"
+          class="packages-grid"
+          hidden
+          role="list"
+          aria-label="Package list"
+        ></div>
+
+        <!-- No results -->
+        <div id="no-results" class="no-results" hidden>
+          <p>No packages match your search. Try different terms or clear the filters.</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer class="site-footer">
+      <div class="container">
+        <p>
+          Data updated:
+          <time id="updated-time">—</time>
+        </p>
+        <p>
+          Package data from
+          <a href="https://github.com/typst/packages" target="_blank" rel="noopener noreferrer"
+            >typst/packages</a
+          >
+          · Browse at
+          <a href="https://typst.app/universe/" target="_blank" rel="noopener noreferrer"
+            >typst.app/universe</a
+          >
+        </p>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
