@@ -77,6 +77,38 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+  push-readmes:
+    name: Push readmes-in-typst-universe
+    needs: [build, deploy]
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install requests
+
+      - name: Fetch package data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/fetch_packages.py
+
+      - name: Push content to readmes-in-typst-universe
+        env:
+          READMES_PAT: ${{ secrets.READMES_PAT }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: python scripts/push_readmes.py
+
   preview:
     name: Deploy / clean-up PR preview
     needs: [build]
