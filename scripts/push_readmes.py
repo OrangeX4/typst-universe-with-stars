@@ -174,8 +174,6 @@ def generate_readme(packages: list[dict], updated_at: str) -> str:
         "full documentation, usage examples, and API reference before forming your answer.\n"
         "3. **Open `metadata/<name>.toml`** if you need the raw package manifest "
         "(e.g., declared dependencies, entry point, template parameters).\n"
-        "4. Return a well-informed answer that cites specific package names and "
-        "version numbers so the user can install them with `typst add <name>`."
     )
     lines.append("")
 
