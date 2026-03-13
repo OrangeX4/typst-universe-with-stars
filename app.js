@@ -194,6 +194,17 @@
   const noResults = document.getElementById("no-results");
   const resultInfo = document.getElementById("result-info");
 
+  // Track last rendered column count to avoid unnecessary re-renders on resize
+  let lastColCount = 0;
+
+  function getColumnCount() {
+    const width = grid.offsetWidth;
+    if (width <= 0) return 1;
+    const colWidth = window.innerWidth >= 1024 ? 320 : 300;
+    const gap = 20;
+    return Math.max(1, Math.floor((width + gap) / (colWidth + gap)));
+  }
+
   function render() {
     const filtered = applyFilters(allPackages);
 
@@ -206,8 +217,24 @@
       noResults.hidden = true;
       grid.hidden = false;
 
+      const numCols = getColumnCount();
+      lastColCount = numCols;
+
+      // Create one flex column per masonry column
+      const columns = Array.from({ length: numCols }, () => {
+        const col = document.createElement("div");
+        col.className = "masonry-col";
+        return col;
+      });
+
+      // Distribute items left-to-right (round-robin) so that the highest-ranked
+      // items appear across the top of all columns rather than piling up in col 1.
+      filtered.forEach((pkg, i) => {
+        columns[i % numCols].appendChild(buildCard(pkg));
+      });
+
       const frag = document.createDocumentFragment();
-      filtered.forEach((pkg) => frag.appendChild(buildCard(pkg)));
+      columns.forEach((col) => frag.appendChild(col));
       grid.appendChild(frag);
     }
 
@@ -304,6 +331,11 @@
       render();
       searchInput.focus();
     });
+
+    // Re-render when the viewport is resized enough to change column count
+    window.addEventListener("resize", debounce(() => {
+      if (allPackages.length > 0 && getColumnCount() !== lastColCount) render();
+    }, 150));
   }
 
   // -----------------------------------------------------------------------

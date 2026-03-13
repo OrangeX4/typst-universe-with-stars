@@ -305,8 +305,14 @@ a { color: inherit; text-decoration: none; }
    Package grid  –  masonry / waterfall
    ========================================================= */
 .packages-grid {
-  column-width: 300px;
-  column-gap: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.masonry-col {
+  flex: 1;
+  min-width: 0;
 }
 
 /* =========================================================
@@ -513,16 +519,6 @@ a { color: inherit; text-decoration: none; }
 
   .pill { padding: 4px 10px; }
 
-  .packages-grid {
-    column-width: auto;
-    column-count: 1;
-  }
-}
-
-@media (min-width: 1024px) {
-  .packages-grid {
-    column-width: 320px;
-  }
 }
 
 /* =========================================================
