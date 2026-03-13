@@ -12,14 +12,18 @@ For each package the script:
     repo itself)
   - Records when the latest version was first added to typst/packages via
     git history
-  - Builds a thumbnail URL for template packages
+  - Copies the template thumbnail image to a local thumbnails/ directory
+  - Copies package README files to a local packages-docs/ directory
 
 Output: packages.json at the repository root.
+         thumbnails/<name>/<version>/<file> – thumbnail images.
+         packages-docs/<name>.md           – per-package README (if present).
 """
 
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -40,6 +44,10 @@ if GITHUB_TOKEN:
 
 TYPST_PACKAGES_URL = "https://github.com/typst/packages"
 CLONE_DIR = "/tmp/typst-packages"
+
+REPO_ROOT = Path(__file__).parent.parent
+THUMBNAILS_DIR = REPO_ROOT / "thumbnails"
+PACKAGES_DOCS_DIR = REPO_ROOT / "packages-docs"
 
 # ---------------------------------------------------------------------------
 # Repository helpers
@@ -250,15 +258,39 @@ def process_packages() -> list[dict]:
                 stars = info.get("stars")
                 last_update = info.get("pushed_at")
 
-        # Build thumbnail URL for templates.
+        # Copy thumbnail for templates and record a relative path.
         thumbnail: str | None = None
         if is_template and tmpl_meta:
             thumb = tmpl_meta.get("thumbnail")
             if thumb:
-                thumbnail = (
-                    "https://raw.githubusercontent.com/typst/packages/main"
-                    f"/packages/preview/{pkg_name}/{latest_ver}/{thumb}"
+                src = (
+                    Path(CLONE_DIR)
+                    / "packages"
+                    / "preview"
+                    / pkg_name
+                    / latest_ver
+                    / thumb
                 )
+                if src.exists():
+                    dst_dir = THUMBNAILS_DIR / pkg_name / latest_ver
+                    dst_dir.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(src, dst_dir / thumb)
+                    thumbnail = f"thumbnails/{pkg_name}/{latest_ver}/{thumb}"
+
+        # Copy README (any casing) for the package if present.
+        pkg_ver_dir = Path(CLONE_DIR) / "packages" / "preview" / pkg_name / latest_ver
+        readme_src: Path | None = None
+        for readme_name in ("README.md", "readme.md", "Readme.md"):
+            candidate = pkg_ver_dir / readme_name
+            if candidate.exists():
+                readme_src = candidate
+                break
+        if readme_src is not None:
+            try:
+                PACKAGES_DOCS_DIR.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(readme_src, PACKAGES_DOCS_DIR / f"{pkg_name}.md")
+            except OSError as exc:
+                print(f"  Could not copy README for {pkg_name}: {exc}", file=sys.stderr)
 
         last_publish = get_publish_date(pkg_name, latest_ver)
 
@@ -285,6 +317,12 @@ def process_packages() -> list[dict]:
 
 
 def main() -> None:
+    # Recreate output directories so stale files from a previous run are gone.
+    for d in (THUMBNAILS_DIR, PACKAGES_DOCS_DIR):
+        if d.exists():
+            shutil.rmtree(d)
+        d.mkdir(parents=True)
+
     setup_repo()
     packages = process_packages()
 
@@ -293,11 +331,13 @@ def main() -> None:
         "packages": packages,
     }
 
-    out_path = Path(__file__).parent.parent / "packages.json"
+    out_path = REPO_ROOT / "packages.json"
     with open(out_path, "w", encoding="utf-8") as fh:
         json.dump(output, fh, indent=2, ensure_ascii=False)
 
     print(f"\nWrote {len(packages)} packages → {out_path}", flush=True)
+    print(f"Thumbnails  → {THUMBNAILS_DIR}", flush=True)
+    print(f"Package docs → {PACKAGES_DOCS_DIR}", flush=True)
 
 
 if __name__ == "__main__":
