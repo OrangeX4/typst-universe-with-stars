@@ -46,6 +46,15 @@ jobs:
           [ -d thumbnails ] && cp -r thumbnails build/thumbnails || true
           [ -d packages-docs ] && cp -r packages-docs build/packages-docs || true
 
+      - name: Upload packages data artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-data
+          path: |
+            packages.json
+            packages-docs/
+            packages-metadata/
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -95,13 +104,11 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Python dependencies
-        run: pip install requests
-
-      - name: Fetch package data
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python scripts/fetch_packages.py
+      - name: Download packages data artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: packages-data
+          path: .
 
       - name: Push content to readmes-in-typst-universe
         env:

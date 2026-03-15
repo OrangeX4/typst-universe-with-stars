@@ -48,6 +48,7 @@ CLONE_DIR = "/tmp/typst-packages"
 REPO_ROOT = Path(__file__).parent.parent
 THUMBNAILS_DIR = REPO_ROOT / "thumbnails"
 PACKAGES_DOCS_DIR = REPO_ROOT / "packages-docs"
+PACKAGES_METADATA_DIR = REPO_ROOT / "packages-metadata"
 
 # ---------------------------------------------------------------------------
 # Repository helpers
@@ -293,6 +294,13 @@ def process_packages() -> list[dict]:
             except OSError as exc:
                 print(f"  Could not copy README for {pkg_name}: {exc}", file=sys.stderr)
 
+        # Copy typst.toml for the package.
+        try:
+            PACKAGES_METADATA_DIR.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(toml_path, PACKAGES_METADATA_DIR / f"{pkg_name}.toml")
+        except OSError as exc:
+            print(f"  Could not copy typst.toml for {pkg_name}: {exc}", file=sys.stderr)
+
         last_publish = get_publish_date(pkg_name, latest_ver)
 
         entry = {
@@ -319,7 +327,7 @@ def process_packages() -> list[dict]:
 
 def main() -> None:
     # Recreate output directories so stale files from a previous run are gone.
-    for d in (THUMBNAILS_DIR, PACKAGES_DOCS_DIR):
+    for d in (THUMBNAILS_DIR, PACKAGES_DOCS_DIR, PACKAGES_METADATA_DIR):
         if d.exists():
             shutil.rmtree(d)
         d.mkdir(parents=True)
@@ -337,8 +345,9 @@ def main() -> None:
         json.dump(output, fh, indent=2, ensure_ascii=False)
 
     print(f"\nWrote {len(packages)} packages → {out_path}", flush=True)
-    print(f"Thumbnails  → {THUMBNAILS_DIR}", flush=True)
+    print(f"Thumbnails   → {THUMBNAILS_DIR}", flush=True)
     print(f"Package docs → {PACKAGES_DOCS_DIR}", flush=True)
+    print(f"Metadata     → {PACKAGES_METADATA_DIR}", flush=True)
 
 
 if __name__ == "__main__":
