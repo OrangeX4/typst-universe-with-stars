@@ -327,6 +327,9 @@ def process_packages() -> list[dict]:
         last_publish = get_publish_date(pkg_name, latest_ver)
 
         deps = extract_dependencies(pkg_ver_dir)
+        # Remove self-references (a package should not list itself as a dependency).
+        self_dep = f"{pkg_name}:{latest_ver}"
+        deps = [d for d in deps if d != self_dep]
 
         entry = {
             "name": pkg_name,
