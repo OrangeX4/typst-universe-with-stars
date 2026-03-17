@@ -474,9 +474,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 .tag.keyword {
-  background: #f8fafc;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
 }
 
 /* Dependencies */
@@ -487,24 +487,14 @@ a { color: inherit; text-decoration: none; }
   gap: 4px;
 }
 
-.deps-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-light);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-right: 2px;
-  flex-shrink: 0;
-}
-
 .dep-tag {
-  font-size: 0.72rem;
-  padding: 2px 7px;
+  font-size: 0.7rem;
+  padding: 1px 6px;
   border-radius: 100px;
-  font-weight: 500;
-  background: #fdf4ff;
-  color: #7e22ce;
-  border: 1px solid #e9d5ff;
+  font-weight: 400;
+  background: #f3f4f6;
+  color: var(--text-light);
+  border: 1px solid var(--border);
 }
 
 /* =========================================================

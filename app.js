@@ -167,6 +167,15 @@
     // Description
     html += `<p class="card-description">${escapeHtml(pkg.description) || "<em>No description available.</em>"}</p>`;
 
+    // Dependencies (shown above categories/keywords, less prominent)
+    const deps = pkg.dependencies || [];
+    if (deps.length > 0) {
+      const depTags = deps
+        .map((d) => `<span class="dep-tag" title="@preview/${escapeHtml(d)}">${escapeHtml(d)}</span>`)
+        .join("");
+      html += `<div class="card-deps">${depTags}</div>`;
+    }
+
     // Tags: categories first, then keywords (max 5 total)
     const categories = (pkg.categories || []).map(
       (c) => `<span class="tag category">${escapeHtml(c)}</span>`
@@ -178,18 +187,6 @@
 
     if (categories.length + keywords.length > 0) {
       html += `<div class="card-tags">${categories.join("")}${keywords.join("")}</div>`;
-    }
-
-    // Dependencies
-    const deps = pkg.dependencies || [];
-    if (deps.length > 0) {
-      const depTags = deps
-        .map((d) => {
-          const name = d.split(":")[0];
-          return `<span class="dep-tag" title="@preview/${escapeHtml(d)}">${escapeHtml(name)}</span>`;
-        })
-        .join("");
-      html += `<div class="card-deps"><span class="deps-label">Deps:</span>${depTags}</div>`;
     }
 
     html += `</div>`; // .card-body
