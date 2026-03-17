@@ -180,6 +180,18 @@
       html += `<div class="card-tags">${categories.join("")}${keywords.join("")}</div>`;
     }
 
+    // Dependencies
+    const deps = pkg.dependencies || [];
+    if (deps.length > 0) {
+      const depTags = deps
+        .map((d) => {
+          const name = d.split(":")[0];
+          return `<span class="dep-tag" title="@preview/${escapeHtml(d)}">${escapeHtml(name)}</span>`;
+        })
+        .join("");
+      html += `<div class="card-deps"><span class="deps-label">Deps:</span>${depTags}</div>`;
+    }
+
     html += `</div>`; // .card-body
 
     a.innerHTML = html;

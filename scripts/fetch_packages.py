@@ -110,6 +110,9 @@ _GITHUB_RE = re.compile(
     r"https?://github\.com/(?P<owner>[^/]+)/(?P<repo>[^/?#\s]+)"
 )
 
+# Matches: import "@preview/name:1.2.3" or import '@preview/name:1.2.3'
+_IMPORT_RE = re.compile(r"""import\s+["']@preview/([a-zA-Z\d_-]+:\d+\.\d+\.\d+)["']""")
+
 
 def is_github_url(url: str | None) -> bool:
     """Return True if *url* is a GitHub repo URL (not the typst/packages repo)."""
@@ -167,6 +170,26 @@ def get_repo_info(owner_repo: str) -> dict:
     # Polite delay to stay well within GitHub's rate-limit.
     time.sleep(0.05)
     return result
+
+
+# ---------------------------------------------------------------------------
+# Dependency helpers
+# ---------------------------------------------------------------------------
+
+
+def extract_dependencies(pkg_ver_dir: Path) -> list[str]:
+    """Return a sorted, deduplicated list of ``name:version`` strings for all
+    ``@preview/…`` imports found in the ``.typ`` files under *pkg_ver_dir*.
+    """
+    deps: set[str] = set()
+    for typ_file in pkg_ver_dir.rglob("*.typ"):
+        try:
+            text = typ_file.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for m in _IMPORT_RE.finditer(text):
+            deps.add(m.group(1))
+    return sorted(deps)
 
 
 # ---------------------------------------------------------------------------
@@ -303,6 +326,8 @@ def process_packages() -> list[dict]:
 
         last_publish = get_publish_date(pkg_name, latest_ver)
 
+        deps = extract_dependencies(pkg_ver_dir)
+
         entry = {
             "name": pkg_name,
             "version": latest_ver,
@@ -316,6 +341,7 @@ def process_packages() -> list[dict]:
             "stars": stars,
             "last_update": last_update,
             "last_publish": last_publish,
+            "dependencies": deps,
         }
         packages.append(entry)
 

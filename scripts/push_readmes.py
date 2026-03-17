@@ -84,6 +84,7 @@ def _pkg_row(pkg: dict) -> str:
     repo = pkg.get("repository") or pkg.get("homepage") or "N/A"
     cats = ", ".join(pkg.get("categories") or []) or "N/A"
     kws = ", ".join(pkg.get("keywords") or []) or "N/A"
+    deps = ", ".join(pkg.get("dependencies") or []) or "N/A"
     return (
         f"| {pkg['name']} "
         f"| {pkg.get('description', '') or ''} "
@@ -93,15 +94,16 @@ def _pkg_row(pkg: dict) -> str:
         f"| {kind} "
         f"| {repo} "
         f"| {cats} "
-        f"| {kws} |"
+        f"| {kws} "
+        f"| {deps} |"
     )
 
 
 TABLE_HEADER = (
     "| Name | Description | Version | Stars | Last Update"
-    " | Type | Repository | Categories | Keywords |\n"
+    " | Type | Repository | Categories | Keywords | Dependencies |\n"
     "|------|-------------|---------|-------|------------|"
-    "------|------------|------------|----------|\n"
+    "------|------------|------------|----------|------------|\n"
 )
 
 
@@ -171,7 +173,8 @@ def generate_readme(packages: list[dict], updated_at: str) -> str:
         "\n"
         "1. **Skim this README** first — every package appears in the table below "
         "with its `name`, `description`, `version`, `stars`, `last update`, "
-        "`type` (package or template), `repository`, `categories`, and `keywords`. "
+        "`type` (package or template), `repository`, `categories`, `keywords`, "
+        "and `dependencies` (other `@preview/…` packages it imports). "
         "Use the table to quickly identify candidate packages that match the query.\n"
         "2. **Open `readmes/<name>.md`** for each promising candidate to read the "
         "full documentation, usage examples, and API reference before forming your answer.\n"
